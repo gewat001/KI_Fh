@@ -2,8 +2,7 @@ package de.fh.stud.p2;
 
 import de.fh.pacman.enums.PacmanTileType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Knoten {
 
@@ -15,14 +14,20 @@ public class Knoten {
 	 */
 	public PacmanTileType[][] world_state;
 	public Knoten parentNote;
-	public int posX;
-	public int posY;
+	public PacmanPosition position;
 
-	public Knoten(PacmanTileType[][] world_state, int posX, int posY){
+	static final Map<Movement, PacmanPosition> movement = new HashMap<Movement, PacmanPosition>(){{
+		put(Movement.GO_EAST, new PacmanPosition(1,0));
+		put(Movement.GO_SOUTH, new PacmanPosition(0, -1));
+		put(Movement.GO_WEST, new PacmanPosition(-1, 0));
+		put(Movement.GO_NORTH, new PacmanPosition(0, 1));
+		// Muss wait auch abgebildet werden?
+	}};
+
+	public Knoten(PacmanTileType[][] world_state, PacmanPosition pos){
 		this.world_state = produceView(world_state);
-		this.posX = posX;
-		this.posY = posY;
-		this.world_state[this.posX][this.posY] = PacmanTileType.PACMAN;
+		this.position = pos;
+		this.world_state[pos.x][pos.y] = PacmanTileType.PACMAN;
 	}
 
 	public List<Knoten> expand() {
@@ -31,8 +36,19 @@ public class Knoten {
 		 * Die Methode soll die neu erzeugten Knoten (die Kinder des Knoten) zurückgeben.
 		 */
 		List<Knoten> noteList = new ArrayList<>();
+		Iterator noteIterator = movement.entrySet().iterator();
 
-		return null;
+		while(noteIterator.hasNext()){
+			Map.Entry mapEntry = (Map.Entry)noteIterator.next();
+			if(wallCheck(position.change((PacmanPosition) mapEntry.getValue()))){
+				Knoten note = new Knoten(produceView(world_state), position.change((PacmanPosition)mapEntry.getValue()));
+				note.world_state[position.x][position.y] = PacmanTileType.EMPTY;
+				note.parentNote = this;
+				noteList.add(note);
+			}
+		}
+		System.out.println("-->");
+		return noteList;
 	}
 
 	public PacmanTileType[][] produceView(PacmanTileType[][] oldWorldState){
@@ -46,7 +62,7 @@ public class Knoten {
 		return newView;
 	}
 
-	public boolean wallCheck(int X, int posY){
-		return world_state[posX][posY] != PacmanTileType.WALL;
+	public boolean wallCheck(PacmanPosition pos){
+		return world_state[pos.x][pos.y] != PacmanTileType.WALL;
 	}
 }

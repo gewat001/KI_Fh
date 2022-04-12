@@ -2,6 +2,8 @@ package de.fh.stud.p2;
 
 import de.fh.pacman.enums.PacmanTileType;
 
+import java.util.List;
+
 public class BaumTest {
 
 	public static void main(String[] args) {
@@ -19,5 +21,11 @@ public class BaumTest {
 		 * Anfangszustand (siehe view, posX und posY) den Suchbaum auf.
 		 */
 		System.out.println(view.length);
+	}
+
+	public static void expandIt(List<Knoten> noteList){
+		for(Knoten notes: noteList){
+			
+		}
 	}
 }
